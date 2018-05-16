@@ -21,4 +21,4 @@ $ npm run dev
 ```
 
 ## Todo 
-- [] Update the documentation with current changes
+- [ ] Update the documentation with current changes
