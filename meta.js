@@ -156,6 +156,13 @@ module.exports = {
         },
       ],
     },
+    srcAlias: {
+      when: 'isNotTest',
+      type: 'string',
+      required: true,
+      message: 'Path alias for src folder in imports statements',
+      default: '@',
+    }
   },
   filters: {
     '.eslintrc.js': 'lint',

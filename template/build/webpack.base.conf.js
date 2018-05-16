@@ -1,5 +1,6 @@
 'use strict'
 const path = require('path')
+var { VueLoaderPlugin } = require('vue-loader')
 const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
@@ -21,9 +22,11 @@ function resolve (dir) {
 
 module.exports = {
   context: path.resolve(__dirname, '../'),
+
   entry: {
-    app: './src/main.js'
+    app: './src/main.ts',
   },
+
   output: {
     path: config.build.assetsRoot,
     filename: '[name].js',
@@ -32,12 +35,12 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.tsx', '.ts', '.js', '.vue', '.json'],
     alias: {
       {{#if_eq build "standalone"}}
       'vue$': 'vue/dist/vue.esm.js',
       {{/if_eq}}
-      '@': resolve('src'),
+      '{{ srcAlias }}': resolve('src'),
     }
   },
   module: {
@@ -45,16 +48,31 @@ module.exports = {
       {{#lint}}
       ...(config.dev.useEslint ? [createLintingRule()] : []),
       {{/lint}}
+
       {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: vueLoaderConfig
       },
       {
-        test: /\.js$/,
-        loader: 'babel-loader',
+        test: /\.pug$/,
+        loader: 'pug-plain-loader',
+      },
+
+      {
+        test: /\.tsx?$/,
+        use: [
+          { loader: 'ts-loader', options: { appendTsSuffixTo: [/\.vue$/], transpileOnly: true}}
+        ],
         include: [resolve('src'), resolve('test'), resolve('node_modules/webpack-dev-server/client')]
       },
+
+      {
+        test: /\.js$/,
+        loader: 'babel-loader?cacheDirectory',
+        include: [resolve('src'), resolve('test'), resolve('node_modules/webpack-dev-server/client')]
+      },
+
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
@@ -78,7 +96,11 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
-      }
+      },
+      {
+        test: /\.(svg|eot|woff|ttf|svg|woff2)(\?.*)?$/,
+        loader: 'file-loader',
+      },
     ]
   },
   node: {
@@ -92,5 +114,35 @@ module.exports = {
     net: 'empty',
     tls: 'empty',
     child_process: 'empty'
-  }
+  },
+
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          chunks: 'all',
+          name: 'vendors',
+          enforce: true,
+          reuseExistingChunk: true,
+          priority: -5,
+          test: /[\\/]node_modules[\\/]/,
+        },
+
+        manifest: {
+          name: 'manifest',
+          minChunks: Infinity,
+        },
+
+        app: {
+          name: 'app',
+          minChunks: 3
+        },
+
+      },
+    },
+  },
+
+  plugins: [
+    new VueLoaderPlugin(),
+  ]
 }

@@ -1,28 +1,29 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
+  .app
+    img(src="./assets/logo.png")
     {{#router}}
-    <router-view/>
+    router-view
     {{else}}
-    <HelloWorld/>
+    HelloWorld
     {{/router}}
-  </div>
 </template>
 
-<script>
-{{#unless router}}
-import HelloWorld from './components/HelloWorld'
 
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+{{#unless router}}
+import HelloWorld from '{{ srcAlias }}/components/HelloWorld'
 {{/unless}}
-export default {
-  name: 'App'{{#router}}{{else}},
+
+{{#router}}@Component{{else}}@Component({
   components: {
     HelloWorld
-  }{{/router}}
-}
+  }
+}){{/router}}
+export default class AppComponent extends Vue {}
 </script>
 
-<style>
+<style lang="scss">
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
