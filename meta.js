@@ -160,7 +160,7 @@ module.exports = {
       when: 'isNotTest',
       type: 'string',
       required: true,
-      message: 'Path alias for src folder in imports statements',
+      message: 'Path alias for src folder in import statements',
       default: '@',
     }
   },
